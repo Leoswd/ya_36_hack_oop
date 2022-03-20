@@ -1,4 +1,7 @@
 import random
+from colorama import init
+init()
+from colorama import Fore
 
 
 class Thing:
@@ -15,14 +18,15 @@ class Thing:
         self.hitpoints = hitpoints
 
     def __str__(self):
-        return f"{self.name}: {self.defence}, {self.attack}, {self.hitpoints}"
+        return (f'{self.name}({self.defence:.3f}, '
+                f'{self.attack}, {self.hitpoints})')
 
 
 class Person:
 
-    DEFENCE=0.1
-    ATTACK=5
-    HITPOINTS=20
+    DEFENCE = 0.1
+    ATTACK = 5
+    HITPOINTS = 20
 
     def __init__(self,
                  name: str
@@ -30,53 +34,62 @@ class Person:
         self.name = name
 
     def __str__(self):
-        return f"{type(self).__name__} {self.name}: {self.HITPOINTS}, {self.ATTACK}, {self.DEFENCE:.2f}"
+        return (f'{type(self).__name__} {self.name}: '
+                f'{self.HITPOINTS}, {self.ATTACK}, {self.DEFENCE:.3f}')
 
-
-    def set_things(self,things):
+    def set_things(self, things):
+        self.things = things
+        print(f'{type(self).__name__} {self.name} надевает:')
         for obj in things:
-            self.DEFENCE+=obj.defence
-            self.ATTACK+=obj.attack
-            self.HITPOINTS+=obj.hitpoints
-            print(f'{type(self).__name__} {self.name} надел {obj.name}')
+            print(obj)
+            self.DEFENCE += obj.defence
+            self.ATTACK += obj.attack
+            self.HITPOINTS += obj.hitpoints
+        print()
 
     def attack_damage(self, attacker):
         damage = attacker.ATTACK - attacker.ATTACK * self.DEFENCE
-        print(f'{attacker.name} наносит удар по {self.name} на {damage:.2f} урона')
+        print(Fore.YELLOW + f'{attacker.name} наносит удар по {self.name} '
+              f'на {damage:.3f} урона')
         self.HITPOINTS -= damage
 
 
 class Paladin(Person):
-    DEFENCE=0.2
-    HITPOINTS=40
+    DEFENCE = 2 * Person.DEFENCE
+    HITPOINTS = 2 * Person.HITPOINTS
 
-    
+
 class Warrior(Person):
-    ATTACK=10
+    ATTACK = 2 * Person.ATTACK
 
+
+class Elf(Person):
+    DEFENCE = 2 * Person.DEFENCE
+    ATTACK = 2 * Person.ATTACK
 
 
 def main() -> None:
 
-    #NAMES=[]
-    #for i in range(20):
-    #    NAMES.append('Soldier_'+str(i+1))
-    NAMES=['Arny','Bruce','Jan-Clod','Jacky','Steve','Logan','Peter', 'Kate','Sam', 'Tom',
-           'Fred','Mary','Jane','Richard','Arthur','Scott','Pierce','Bill', 'Molly','Dave']
+    SOLDIER_TYPES = [Paladin, Warrior, Elf]
 
-    THING_NAMES = ['MagicRing', 'Sword', 'Shield']
+    NAMES = ['Arny', 'Bruce', 'JanClod', 'Jackie', 'Steve', 'Logan',
+             'Peter', 'Kate', 'Sam', 'Tom', 'Fred', 'Mary', 'Jane',
+             'Richard', 'Arthur', 'Scott', 'Pierce', 'Bill', 'Molly', 'Dave']
+
+    THING_TYPES = ['MagicRing', 'MagicStaff', 'Sword', 'Shield',
+                   'Jacket', 'Boots', 'Helmet', 'Bow']
 
     THINGS = []
-    for i in range(40):
-        THINGS.append(Thing(THING_NAMES[random.randint(0,len(THING_NAMES)-1)],0.1,1,1))
+    for i in range(random.randint(40, 100)):
+        THINGS.append(Thing(THING_TYPES[random.randint(0, len(THING_TYPES)-1)],
+                      random.randint(0, 100)/1000, random.randint(0, 5),
+                      random.randint(0, 20)))
+    # THINGS.sort()
 
-    SOLDIERS=[]
+    SOLDIERS = []
     for i in range(10):
-        pal_war = random.randint(1, 2)
-        if pal_war==1:
-            SOLDIERS.append(Paladin(NAMES.pop(random.randint(0,len(NAMES)-1))))
-        else:
-            SOLDIERS.append(Warrior(NAMES.pop(random.randint(0,len(NAMES)-1))))
+        SOLDIERS.append(random.choice(SOLDIER_TYPES)(NAMES.pop(
+                             random.randint(0, len(NAMES)-1))))
 
     print('Initial stats:')
     for s in SOLDIERS:
@@ -95,19 +108,20 @@ def main() -> None:
     print('Stats after setting things:')
     for s in SOLDIERS:
         print(s)
-    
+
     print()
-    
-    while len(SOLDIERS)>1:
+
+    print(Fore.RED + 'БОЙ НАЧИНАЕТСЯ!')
+    while len(SOLDIERS) > 1:
         attacker, defender = random.sample(SOLDIERS, 2)
         defender.attack_damage(attacker)
-        if defender.HITPOINTS<=0:
-            print(f'{defender.name} погибает')
+        if defender.HITPOINTS <= 0:
+            print(Fore.RED + f'{defender.name} погибает')
             SOLDIERS.remove(defender)
 
     print()
 
-    print(f'Побеждает {SOLDIERS[0].name}!')
+    print(Fore.GREEN + f'Побеждает {SOLDIERS[0].name}!'.upper())
 
 
 if __name__ == '__main__':
