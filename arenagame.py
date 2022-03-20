@@ -4,6 +4,7 @@ from typing import List, Type
 
 
 class Thing:
+    """Базовый класс экипировки."""
 
     def __init__(self,
                  name: str,
@@ -38,6 +39,7 @@ class Person:
                 f'{self.HITPOINTS}, {self.ATTACK}, {self.DEFENCE:.3f}')
 
     def set_things(self, things) -> None:
+        """Надеть предметы экипировки."""
         self.things: List[Type[Thing]] = things
         print(f'{type(self).__name__} {self.name} надевает:')
         for obj in things:
@@ -48,6 +50,7 @@ class Person:
         print()
 
     def attack_person(self, attacker) -> None:
+        """Атака противника."""
         damage: float = attacker.ATTACK - attacker.ATTACK * self.DEFENCE
         print(Fore.YELLOW + f'{attacker.name} наносит удар по {self.name} '
               f'на {damage:.3f} урона')
@@ -75,7 +78,7 @@ class Elf(Person):
 
 
 def main() -> None:
-
+    """Главная функция."""
     NUM_FIGHTERS: int = 10
 
     FIGHTER_TYPES: List[Type[Person]] = [Paladin, Warrior, Elf]
